@@ -22,6 +22,25 @@ class CustomEvaluationFramework(EvaluationFramework):
         self.tests_per_project = {}
         self.tests = {}
         self.initialize_tests_and_url_queues()
+        self.initialize_wpt_tests()
+
+    # TODO: Add project file for wpt
+    def initialize_wpt_tests(self):
+        wpt_path = "/home/test/web-platform-tests/content-security-policy"
+        page_folder_path = Global.custom_page_folder
+        if "wpt" in os.listdir(page_folder_path):
+            return
+        url = "http://web-platform.test"
+        for test_type in os.listdir(wpt_path):
+            url_test_type = os.path.join(url, test_type)
+            wpt_path_test_type = os.path.join(wpt_path, test_type)
+            for test_file in os.listdir(wpt_path_test_type):
+                if test_file.endswith('.html'):
+                    url_test = os.path.join(url_test_type,test_file)
+                    test_name = os.path.splitext(test_file)[0]
+                    self.tests_per_project['wpt'][test_name] = [url_test]
+                    self.tests[test_name] = self.tests_per_project['wpt'][test_name]
+                    
 
     def initialize_tests_and_url_queues(self):
         page_folder_path = Global.custom_page_folder
@@ -48,6 +67,7 @@ class CustomEvaluationFramework(EvaluationFramework):
                                 'https://a.test/report/?leak=baseline'
                             ]
                             self.tests[test_name] = self.tests_per_project[project_name][test_name]
+
 
     def perform_specific_evaluation(self, browser: Browser, params: TestParameters) -> TestResult:
         logger.info(f'Starting test for {params}')

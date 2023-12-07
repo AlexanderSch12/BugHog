@@ -24,22 +24,28 @@ class CustomEvaluationFramework(EvaluationFramework):
         self.initialize_tests_and_url_queues()
         self.initialize_wpt_tests()
 
-    # TODO: Add project file for wpt
+    # TODO: init wpt tests
     def initialize_wpt_tests(self):
-        wpt_path = "/home/test/web-platform-tests/content-security-policy"
-        page_folder_path = Global.custom_page_folder
-        if "wpt" in os.listdir(page_folder_path):
+        wpt_path = "/home/test/web-platform-tests"
+        if not os.listdir(wpt_path):
             return
+        subject_name = "content-security-policy"
+        subject_path =  os.path.join(wpt_path, subject_name)
         url = "http://web-platform.test"
-        for test_type in os.listdir(wpt_path):
-            url_test_type = os.path.join(url, test_type)
-            wpt_path_test_type = os.path.join(wpt_path, test_type)
-            for test_file in os.listdir(wpt_path_test_type):
+        url_subject = os.path.join(url,subject_name)
+        for test_type in os.listdir(subject_path):
+            test_type_path = os.path.join(subject_path, test_type)
+            url_test_type = os.path.join(url_subject, test_type)
+            if not os.path.isdir(test_type_path):
+                continue
+            project_name = "WPT CSP: " + test_type
+            self.tests_per_project[project_name] = {}
+            for test_file in os.listdir(test_type_path):
                 if test_file.endswith('.html'):
                     url_test = os.path.join(url_test_type,test_file)
                     test_name = os.path.splitext(test_file)[0]
-                    self.tests_per_project['wpt'][test_name] = [url_test]
-                    self.tests[test_name] = self.tests_per_project['wpt'][test_name]
+                    self.tests_per_project[project_name][test_name] = [url_test]
+                    self.tests[test_name] = self.tests_per_project[project_name][test_name]
                     
 
     def initialize_tests_and_url_queues(self):

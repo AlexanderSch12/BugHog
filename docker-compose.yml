@@ -30,7 +30,7 @@ services:
       - ./logs:/app/logs:rw
       - /var/run/docker.sock:/var/run/docker.sock:rw
       - /dev/shm:/dev/shm:rw
-      - ./wpt:/home/test/web-platform-tests
+      - ../wpt:/home/test/web-platform-tests
     container_name: bh_core
 
   #=============#
@@ -115,7 +115,7 @@ services:
           - sub.sub.a.test
           - b.test
           - adition.com
-          - web.platform.test
+          - web-platform.test
 
   #================#
   # NODE FRONT END #

@@ -1,5 +1,6 @@
 import logging
 import os
+import socket
 from unittest import TestResult
 from bci.browser.configuration.browser import Browser
 
@@ -8,7 +9,6 @@ from bci.evaluations.custom.custom_mongodb import CustomMongoDB
 from bci.evaluations.evaluation_framework import EvaluationFramework
 from bci.evaluations.logic import TestParameters
 from bci.http.collector import Collector
-
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +24,14 @@ class CustomEvaluationFramework(EvaluationFramework):
         self.initialize_tests_and_url_queues()
         self.initialize_wpt_tests()
 
-    # TODO: init wpt tests
+
     def initialize_wpt_tests(self):
         wpt_path = "/home/test/web-platform-tests"
         if not os.listdir(wpt_path):
             return
         subject_name = "content-security-policy"
         subject_path =  os.path.join(wpt_path, subject_name)
-        url = "http://web-platform.test"
+        url = "http://web-platform.test:8000"
         url_subject = os.path.join(url,subject_name)
         for test_type in os.listdir(subject_path):
             test_type_path = os.path.join(subject_path, test_type)
@@ -83,14 +83,17 @@ class CustomEvaluationFramework(EvaluationFramework):
         collector = Collector()
         collector.start()
 
+        host_name = socket.gethostname()
         is_dirty = False
         try:
             url_queue = self.tests[params.mech_group]
             for url in url_queue:
+                url_get = url + '?remote_ip=' + host_name
+                logger.debug(url_get)
                 tries = 0
                 while tries < 3:
                     tries += 1
-                    browser.visit(url)
+                    browser.visit(url_get)
         except Exception as e:
             logger.error(f'Error during test: {e}', exc_info=True)
             is_dirty = True
@@ -101,7 +104,16 @@ class CustomEvaluationFramework(EvaluationFramework):
                     is_dirty = True
             result = {
                 'requests': collector.requests
-            }
+            }   
+        
+        logger.debug(f'colllector requests = {collector.requests}')
+        for request in collector.requests:
+            if "wpt_result" in request:
+                if request["wpt_result"]:
+                    return params.create_test_result_with(browser_version, binary_origin, result, is_dirty)
+                else:
+                    return None
+
         return params.create_test_result_with(browser_version, binary_origin, result, is_dirty)
 
     def get_mech_groups(self, project=None):

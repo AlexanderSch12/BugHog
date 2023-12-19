@@ -82,6 +82,7 @@ class WorkerManager:
                         os.path.join(os.getenv('host_pwd'), 'browser/extensions') + ':/app/browser/extensions',
                         os.path.join(os.getenv('host_pwd'), 'logs') + ':/app/logs',
                         '/dev/shm:/dev/shm',
+                        os.path.join(os.getenv('host_pwd'), '../wpt') + ":/home/test/web-platform-tests"
                     ],
                 )
                 logger.debug(f'Container \'{container_name}\' finished experiments with command \'{command}\'')

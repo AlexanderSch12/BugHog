@@ -102,24 +102,36 @@ class PlotFactory:
     def __add_outcome_info(params: PlotParameters, docs: dict):
         docs_with_outcome = []
         target_mech_id = params.target_mech_id if params.target_mech_id else params.mech_group
-
+        
         for doc in docs:
-            requests_to_target = list(filter(lambda x: f'/report/?leak={target_mech_id}' in x['url'], doc['results']['requests']))
-            requests_to_baseline = list(filter(lambda x: '/report/?leak=baseline' in x['url'], doc['results']['requests']))
             new_doc = {
                 'revision_number': doc['revision_number'],
                 'browser_version': int(doc['browser_version'].split('.')[0]),
                 'browser_version_str': doc['browser_version'].split('.')[0]
             }
-            if doc['dirty'] or len(requests_to_baseline) == 0:
-                new_doc['outcome'] = 'Error'
-                docs_with_outcome.append(new_doc)
-            elif len(requests_to_target) > 0:
-                new_doc['outcome'] = 'Reproduced'
+            if doc['wpt']:
+                result = doc['results']['requests'][0]['wpt_result']
+                if result == True:
+                    new_doc['outcome'] = 'Not reproduced'
+                elif result == False:
+                    new_doc['outcome'] = 'Reproduced'
+                else:
+                    new_doc['outcome'] = 'Error'
                 docs_with_outcome.append(new_doc)
             else:
-                new_doc['outcome'] = 'Not reproduced'
-                docs_with_outcome.append(new_doc)
+                requests_to_target = list(filter(lambda x: f'/report/?leak={target_mech_id}' in x['url'], doc['results']['requests']))
+                requests_to_baseline = list(filter(lambda x: '/report/?leak=baseline' in x['url'], doc['results']['requests']))
+
+                if doc['dirty'] or len(requests_to_baseline) == 0:
+                    new_doc['outcome'] = 'Error'
+                    docs_with_outcome.append(new_doc)
+                elif len(requests_to_target) > 0:
+                    new_doc['outcome'] = 'Reproduced'
+                    docs_with_outcome.append(new_doc)
+                else:
+                    new_doc['outcome'] = 'Not reproduced'
+                    docs_with_outcome.append(new_doc)
+
         docs_with_outcome = PlotFactory.__transform_to_bokeh_compatible(docs_with_outcome)
         return docs_with_outcome
 

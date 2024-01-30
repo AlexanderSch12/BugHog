@@ -101,6 +101,7 @@ class MongoDB(ABC):
             'mech_group': result.params.mech_group,
             'results': result.requests,
             'dirty': result.is_dirty,
+            'wpt': result.is_wpt,
             'ts': str(datetime.now(timezone.utc).replace(microsecond=0))
         }
         if result.driver_version:
@@ -125,7 +126,8 @@ class MongoDB(ABC):
             document['browser_version'],
             document['binary_origin'],
             requests=document['results']['requests'] if 'requests' in document['results'] else None,
-            is_dirty=document['dirty']
+            is_dirty=document['dirty'],
+            is_wpt=document['wpt']
         )
 
     def has_result(self, params: TestParameters) -> bool:
@@ -313,7 +315,8 @@ class MongoDB(ABC):
                     'revision_number': True,
                     'browser_version': True,
                     'dirty': True,
-                    'results': True
+                    'results': True,
+                    'wpt': True
                 }
             },
             {

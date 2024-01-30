@@ -11,7 +11,7 @@ from bci.evaluations.logic import TestParameters
 from bci.http.collector import Collector
 
 logger = logging.getLogger(__name__)
-
+hostname = socket.gethostname()
 
 class CustomEvaluationFramework(EvaluationFramework):
 
@@ -43,6 +43,7 @@ class CustomEvaluationFramework(EvaluationFramework):
             for test_file in os.listdir(test_type_path):
                 if test_file.endswith('.html'):
                     url_test = os.path.join(url_test_type,test_file)
+                    url_test = url_test +'?remote_ip=' + hostname
                     test_name = os.path.splitext(test_file)[0]
                     self.tests_per_project[project_name][test_name] = [url_test]
                     self.tests[test_name] = self.tests_per_project[project_name][test_name]
@@ -83,17 +84,14 @@ class CustomEvaluationFramework(EvaluationFramework):
         collector = Collector()
         collector.start()
 
-        host_name = socket.gethostname()
         is_dirty = False
         try:
             url_queue = self.tests[params.mech_group]
             for url in url_queue:
-                url_get = url + '?remote_ip=' + host_name
-                logger.debug(url_get)
                 tries = 0
                 while tries < 3:
                     tries += 1
-                    browser.visit(url_get)
+                    browser.visit(url)
         except Exception as e:
             logger.error(f'Error during test: {e}', exc_info=True)
             is_dirty = True
@@ -104,17 +102,12 @@ class CustomEvaluationFramework(EvaluationFramework):
                     is_dirty = True
             result = {
                 'requests': collector.requests
-            }   
-        
-        logger.debug(f'colllector requests = {collector.requests}')
-        for request in collector.requests:
-            if "wpt_result" in request:
-                if request["wpt_result"]:
-                    return params.create_test_result_with(browser_version, binary_origin, result, is_dirty)
-                else:
-                    return None
+            }
+            is_wpt = len(collector.requests) > 0 and "wpt_result" in collector.requests[0]
 
-        return params.create_test_result_with(browser_version, binary_origin, result, is_dirty)
+        logger.debug(f'collector requests = {collector.requests}')
+
+        return params.create_test_result_with(browser_version, binary_origin, result, is_dirty, is_wpt)
 
     def get_mech_groups(self, project=None):
         if project:

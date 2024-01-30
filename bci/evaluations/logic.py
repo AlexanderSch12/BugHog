@@ -211,13 +211,14 @@ class TestParameters:
     mech_group: str
     database_collection: str
 
-    def create_test_result_with(self, browser_version: str, binary_origin: str, result: dict, dirty: bool) -> TestResult:
+    def create_test_result_with(self, browser_version: str, binary_origin: str, result: dict, dirty: bool, wpt: bool) -> TestResult:
         return TestResult(
             self,
             browser_version,
             binary_origin,
             result,
-            dirty
+            dirty,
+            wpt
         )
 
 
@@ -228,6 +229,7 @@ class TestResult:
     binary_origin: str
     requests: list | None = None
     is_dirty: bool = False
+    is_wpt: bool = False
     driver_version: str | None = None
 
     @property

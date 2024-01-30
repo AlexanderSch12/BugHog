@@ -22,7 +22,7 @@ SELENIUM_USED_FLAGS = [
     '--disable-prompt-on-repost',
     '--disable-sync',
     '--disable-web-resources',
-    '--enable-logging',
+    '--enable-logging=stderr',
     '--log-level=0',
     '--metrics-recording-only',
     '--no-first-run',

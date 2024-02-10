@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "BugHog",
+            "type": "python",
+            "request": "launch",
+            "program": "/app/bci/ui/app.py",
+            "purpose": [
+                "debug-test"
+            ],
+            "env": {
+                "PYTHONPATH": "/app",
+                "DISPLAY": ":1",
+                "MOZ_DISABLE_CONTENT_SANDBOX": "1",
+                "PATH":"${PATH}:$HOME/.local/bin"
+            }
+        }
+    ]
+}

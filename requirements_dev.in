@@ -1,0 +1,12 @@
+-r requirements.txt
+anybadge
+boto3
+botocore
+coverage
+debugpy
+flake8
+isort
+pylint
+pytest
+pytest-cov
+pytest-flake8

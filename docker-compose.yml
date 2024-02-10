@@ -1,0 +1,207 @@
+version: '3'
+services:
+
+#============#
+# BASE IMAGE #
+#============#
+
+  base:
+    build:
+      context: .
+      target: core
+    image: registry.gitlab.kuleuven.be/distrinet/research/bughog/core/core:latest
+    pull_policy: if_not_present
+    shm_size: '2gb'
+    networks:
+      bh_net:
+        aliases:
+          - core
+    environment:
+      - host_pwd=${PWD}
+    # 192.168.0.1 instead of 172.17.0.1 because /etc/docker/daemon.json is modified
+    ports:
+      - "5000:5000"
+    volumes:
+      - .env:/app/.env:ro
+      - ./browser/binaries/chromium/artisanal:/app/browser/binaries/chromium/artisanal:rw
+      - ./browser/binaries/firefox/artisanal:/app/browser/binaries/firefox/artisanal:rw
+      - ./experiments:/app/experiments:ro
+      - ./browser/extensions:/app/browser/extensions:ro
+      - ./logs:/app/logs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /dev/shm:/dev/shm:rw
+      - ../wpt:/home/test/web-platform-tests
+    container_name: bh_core
+
+  #=============#
+  # DEVELOPMENT #
+  #=============#
+
+  core_dev:
+    extends: base
+    hostname: bh_core
+    build:
+      context: .
+      target: dev
+    image: bh_core_dev
+    environment:
+      - "DEVELOPMENT=1"
+      - "PYTHONPATH=/app:/root/.local/bin"
+      - "DISPLAY=:1"
+      - "MOZ_DISABLE_CONTENT_SANDBOX=1"
+      - "PATH=${PATH}:/$HOME/.local/bin"
+    volumes:
+      - .:/app:rw
+    container_name: bh_core_dev
+
+  #============#
+  # PRODUCTION #
+  #============#
+
+  core:
+    extends: base
+    hostname: bh_core
+
+  worker:
+    extends: base
+    build:
+      context: .
+      target: worker
+    image: registry.gitlab.kuleuven.be/distrinet/research/bughog/core/worker:latest
+    pull_policy: if_not_present
+    hostname: bh_worker
+    container_name: bh_worker
+
+  #============#
+  # WPT SERVER #
+  #============#
+
+  wpt:
+    image: wpt:local
+    build:
+      context: ../wpt/tools/docker
+    volumes:
+      - ../wpt:/home/test/web-platform-tests
+    container_name: bh_wpt
+    ports:
+      - 8000:8000
+      - 8443:8443
+    networks:
+      bh_net:
+        aliases:
+          - www2.xn--lve-6lad.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.xn--lve-6lad.not-web-platform.test
+          - www.www.not-web-platform.test
+          - www.www2.not-web-platform.test
+          - web-platform.test
+          - www.xn--n8j6ds53lwwkrqhv28a.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.www2.web-platform.test
+          - www2.xn--lve-6lad.web-platform.test
+          - not-web-platform.test
+          - www1.www2.web-platform.test
+          - xn--lve-6lad.web-platform.test
+          - xn--lve-6lad.xn--n8j6ds53lwwkrqhv28a.not-web-platform.test
+          - www2.www2.not-web-platform.test
+          - www.xn--n8j6ds53lwwkrqhv28a.web-platform.test
+          - xn--lve-6lad.www2.web-platform.test
+          - www2.www1.not-web-platform.test
+          - www.www1.not-web-platform.test
+          - xn--lve-6lad.www1.not-web-platform.test
+          - www1.xn--lve-6lad.web-platform.test
+          - www1.www1.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.xn--n8j6ds53lwwkrqhv28a.web-platform.test
+          - xn--lve-6lad.www1.web-platform.test
+          - www1.xn--n8j6ds53lwwkrqhv28a.not-web-platform.test
+          - www1.www.not-web-platform.test
+          - www.xn--lve-6lad.web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.xn--lve-6lad.web-platform.test
+          - xn--lve-6lad.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.xn--n8j6ds53lwwkrqhv28a.not-web-platform.test
+          - www.web-platform.test
+          - xn--lve-6lad.xn--n8j6ds53lwwkrqhv28a.web-platform.test
+          - xn--lve-6lad.www2.not-web-platform.test
+          - www1.web-platform.test
+          - xn--lve-6lad.www.not-web-platform.test
+          - www1.www.web-platform.test
+          - www2.xn--n8j6ds53lwwkrqhv28a.not-web-platform.test
+          - www2.not-web-platform.test
+          - www1.www1.web-platform.test
+          - www.www.web-platform.test
+          - www2.www2.web-platform.test
+          - www2.web-platform.test
+          - www2.www.web-platform.test
+          - www.not-web-platform.test
+          - www.xn--lve-6lad.not-web-platform.test
+          - www2.www.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.www.not-web-platform.test
+          - www2.xn--n8j6ds53lwwkrqhv28a.web-platform.test
+          - xn--lve-6lad.xn--lve-6lad.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.www1.web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.web-platform.test
+          - xn--lve-6lad.www.web-platform.test
+          - www1.not-web-platform.test
+          - www1.xn--n8j6ds53lwwkrqhv28a.web-platform.test
+          - xn--lve-6lad.xn--lve-6lad.web-platform.test
+          - www1.www2.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.www1.not-web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.www.web-platform.test
+          - www.www2.web-platform.test
+          - xn--n8j6ds53lwwkrqhv28a.www2.not-web-platform.test
+          - www1.xn--lve-6lad.not-web-platform.test
+          - www2.www1.web-platform.test
+          - www.www1.web-platform.test
+    command: bash -c "cd /home/test/web-platform-tests && ./wpt serve"
+
+
+  #===================#
+  # EXPERIMENT SERVER #
+  #===================#
+
+  web:
+    image: "registry.gitlab.kuleuven.be/distrinet/research/bughog/experiment-server:latest"
+    pull_policy: if_not_present
+    volumes:
+      - ./experiments/pages:/experiments/pages:ro
+      - ./experiments/resources:/app/static/resources:ro
+    container_name: bh_web
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      bh_net:
+        aliases:
+          - leak.test
+          - a.test
+          - sub.a.test
+          - sub.sub.a.test
+          - b.test
+          - adition.com
+
+  #================#
+  # NODE FRONT END #
+  #================#
+
+  node_base:
+    image: node:lts-alpine
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./bci/ui/frontend:/app
+    working_dir: /app
+
+  node_install_deps:
+    extends: node_base
+    entrypoint: ["npm", "install"]
+
+  node_dev:
+    extends: node_base
+    entrypoint: ["npm", "run", "dev", "--", "--host"]
+
+  node_build:
+    extends: node_base
+    entrypoint: ["npm", "run", "build"]
+
+networks:
+  bh_net:
+    name: bh_net

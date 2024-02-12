@@ -83,7 +83,7 @@ class BrowserConfiguration:
 class EvaluationConfiguration:
     project: str
     automation: str
-    seconds_per_visit: int = 5
+    seconds_per_visit: int = 10
 
     def to_dict(self) -> dict:
         return asdict(self)

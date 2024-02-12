@@ -100,10 +100,16 @@ class CustomEvaluationFramework(EvaluationFramework):
             if not is_dirty:
                 if len([request for request in collector.requests if 'report/?leak=baseline' in request['url']]) == 0:
                     is_dirty = True
+            if 'wpt' in params.database_collection:
+                    is_wpt = True
+                    if not collector.requests:
+                        collector.requests.append({
+                            'url': 'undefined',
+                            'wpt_result': 'Sanity check: no result received'
+                            })
             result = {
                 'requests': collector.requests
             }
-            is_wpt = len(collector.requests) > 0 and "wpt_result" in collector.requests[0]
 
         logger.debug(f'collector requests = {collector.requests}')
 

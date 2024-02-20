@@ -36,20 +36,27 @@ class Global:
 
     @staticmethod
     def get_database_connection_params() -> DatabaseConnectionParameters:
-        if 'BCI_MONGO_HOST' not in os.environ or \
-                'BCI_MONGO_USERNAME' not in os.environ or \
-                'BCI_MONGO_DATABASE' not in os.environ or \
-                'BCI_MONGO_PASSWORD' not in os.environ:
-            logger.info('Could not find database environment variables, using database container...')
+        required_database_params = [
+            'BCI_MONGO_HOST',
+            'BCI_MONGO_USERNAME',
+            'BCI_MONGO_DATABASE',
+            'BCI_MONGO_PASSWORD'
+        ]
+        missing_database_params = [
+            param for param in required_database_params
+            if os.getenv(param) in ['', None]]
+        if missing_database_params:
+            logger.info(f'Could not find database parameters {missing_database_params}, using database container...')
             return container.run()
         else:
-            logger.info(f'Found database environment variables for connection to \'{os.getenv("BCI_MONGO_HOST")}\'')
-            return DatabaseConnectionParameters(
+            database_params = DatabaseConnectionParameters(
                 os.getenv('BCI_MONGO_HOST'),
                 os.getenv('BCI_MONGO_USERNAME'),
                 os.getenv('BCI_MONGO_PASSWORD'),
                 os.getenv('BCI_MONGO_DATABASE')
             )
+            logger.info(f'Found database environment variables \'{database_params}\'')
+            return database_params
 
 
 class Chromium:

@@ -13,6 +13,7 @@ export default {
     return {
       timer: null,
       projects: [],
+      project_topics: {},
       browsers: [],
       browser_settings: [],
       extensions: [],
@@ -145,6 +146,7 @@ export default {
     this.get_info();
     this.update_results();
     this.get_projects();
+    this.get_topics();
     this.get_browsers();
     setTimeout(function () {
       log_section.scrollTo({ "top": log_section.scrollHeight, "behavior": "auto" });
@@ -155,6 +157,7 @@ export default {
       if (this.projects.length == 0 || this.browsers.length == 0) {
         this.get_projects();
         this.get_browsers();
+        this.get_topics();
       }
       this.get_info();
       this.update_results();
@@ -253,9 +256,34 @@ export default {
           console.error(error);
         });
     },
+    get_topics() {
+      const path = `http://${location.hostname}:5000/api/topics/`;
+      axios.get(path)
+        .then((res) => {
+          this.project_topics = res.data.topics;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    get_topics_tests(project, topic) {
+      const path = `http://${location.hostname}:5000/api/tests/${project}/${topic}`;
+      axios.get(path)
+        .then((res) => {
+          this.tests = res.data.tests;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     set_curr_project(project) {
       this.eval_params.project = project;
       this.get_tests(project);
+      this.eval_params.tests = [];
+    },
+    set_curr_project_topic(project,topic) {
+      this.eval_params.project = project;
+      this.get_topics_tests(project,topic);
       this.eval_params.tests = [];
     },
     set_curr_browser(browser) {
@@ -329,17 +357,35 @@ export default {
 <template>
   <header class="banner-page">
     <div>
-      <button id="dropdown_project" data-dropdown-toggle="project_dropdown" class="button mx-3" type="button">{{
-        eval_params.project || "Project" }}<svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor"
+      <button id="dropdown_project" data-dropdown-toggle="project_dropdown" class="button mx-3" type="button">
+        {{eval_params.project || "Project" }}<svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor"
           viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg></button>
       <!-- Dropdown menu -->
-      <div id="project_dropdown"
-        class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+      <div id="project_dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown_project">
-          <li v-for="project in projects">
-            <a href="#" class="dropdown-item" @click="set_curr_project(project)">{{ project }}</a>
+          <li v-for="(topics, project) in project_topics" :key="project">
+
+
+            <a v-if="topics.length > 0" id="dropdown_topic" dropright data-dropdown-toggle="topic_dropdown" class="dropdown-item">
+              {{ project }}
+              <!-- <svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg> -->
+            </a>
+            <div v-if="topics.length > 0" id="topic_dropdown" dropright class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+              <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown_project">
+                <li v-for="topic in topics">
+
+                  <a href="#" class="dropdown-item" @click="set_curr_project_topic(project,topic)">{{ topic }}</a>
+
+                </li>
+              </ul>
+            </div>
+
+            <a v-else href="#" class="dropdown-item" @click="set_curr_project(project)">{{ project }}</a>
+          
           </li>
         </ul>
       </div>

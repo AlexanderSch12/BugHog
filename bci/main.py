@@ -105,9 +105,17 @@ class Main:
         return Main.master.get_specific_evaluation_framework(evaluation_name).get_mech_groups(project=project)
 
     @staticmethod
-    def get_projects_of_custom_framework() -> list[str]:
+    def get_projects_of_custom_framework():
         return Main.master.available_evaluation_frameworks["custom"].get_projects()
 
+    @staticmethod
+    def get_topics_of_custom_framework() -> list[str]:
+        return Main.master.available_evaluation_frameworks["custom"].get_topics()
+
+    @staticmethod
+    def get_topic_tests_of_custom_framework(project_name: str, topic_name: str) -> list[str]:
+        return Main.master.available_evaluation_frameworks["custom"].get_topic_tests(project_name, topic_name)
+    
     @staticmethod
     def get_html_plot(data: dict) -> tuple[str, int]:
         if data.get('lower_version', None) and data.get('upper_version', None):

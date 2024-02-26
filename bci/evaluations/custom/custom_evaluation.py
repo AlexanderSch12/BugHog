@@ -29,24 +29,32 @@ class CustomEvaluationFramework(EvaluationFramework):
         wpt_path = "/home/test/web-platform-tests"
         if not os.listdir(wpt_path):
             return
-        subject_name = "content-security-policy"
-        subject_path =  os.path.join(wpt_path, subject_name)
+        project_name = "WPT CSP"
+        topic_name = "content-security-policy"
+        topic_path =  os.path.join(wpt_path, topic_name)
         url = "http://web-platform.test:8000"
-        url_subject = os.path.join(url,subject_name)
-        for test_type in os.listdir(subject_path):
-            test_type_path = os.path.join(subject_path, test_type)
-            url_test_type = os.path.join(url_subject, test_type)
-            if not os.path.isdir(test_type_path):
+        url_subject = os.path.join(url,topic_name)
+        self.tests_per_project[project_name] = {}
+
+        for subtopic in os.listdir(topic_path):
+            subtopic_path = os.path.join(topic_path, subtopic)
+            url_subtopic = os.path.join(url_subject, subtopic)
+            if not os.path.isdir(subtopic_path) or subtopic == "support":
                 continue
-            project_name = "WPT CSP: " + test_type
-            self.tests_per_project[project_name] = {}
-            for test_file in os.listdir(test_type_path):
-                if test_file.endswith('.html'):
-                    url_test = os.path.join(url_test_type,test_file)
-                    url_test = url_test +'?remote_ip=' + hostname
-                    test_name = os.path.splitext(test_file)[0]
-                    self.tests_per_project[project_name][test_name] = [url_test]
-                    self.tests[test_name] = self.tests_per_project[project_name][test_name]
+
+            self.tests_per_project[project_name][subtopic] = {}
+            for root,dirs,files in os.walk(subtopic_path):
+                if not dirs or not root.endswith("support"):
+                    for test_file in files:
+                        if test_file.endswith(".html"):
+                            subsubtopic_list = root.split("/" + subtopic + "/")
+                            test_name = os.path.splitext(test_file)[0]
+                            subsubtopic = "" if len(subsubtopic_list) == 1 else subsubtopic_list[1]
+                            test_name = test_name if len(subsubtopic_list) == 1 else subsubtopic + "-" + test_name
+                            url_test = os.path.join(url_subtopic, subsubtopic, test_file) +'?remote_ip=' + hostname
+                            self.tests_per_project[project_name][subtopic][test_name] = [url_test]
+                            self.tests[test_name] = self.tests_per_project[project_name][subtopic][test_name]
+
                     
 
     def initialize_tests_and_url_queues(self):
@@ -122,3 +130,16 @@ class CustomEvaluationFramework(EvaluationFramework):
 
     def get_projects(self) -> list[str]:
         return sorted(list(self.tests_per_project.keys()))
+    
+    def get_topics(self):
+        top = {}
+        for project, topics in self.tests_per_project.items():
+            if project == 'WPT CSP':
+                top[project] = list(topics.keys())
+            else:
+                top[project] = []
+        return top
+    
+    def get_topic_tests(self, project, topic):
+        l = sorted(list(self.tests_per_project[project][topic].keys()))
+        return l

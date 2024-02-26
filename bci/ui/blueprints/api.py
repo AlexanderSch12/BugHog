@@ -121,6 +121,33 @@ def get_projects():
         'projects': bci_api.get_projects_of_custom_framework()
     }
 
+@api.route('/topics/', methods=['GET'])
+def get_topics():
+    try:
+        return {
+            'status': 'OK',
+            'topics': bci_api.get_topics_of_custom_framework()
+        }
+    except Exception as e:
+        return {
+            'status': 'NOK',
+            'msg': str(e)
+        }
+    
+@api.route('/tests/<string:project_name>/<string:topic_name>', methods=['GET'])
+def get_topic_tests(project_name: str, topic_name: str):
+    try:
+        return {
+            'status': 'OK',
+            'project': project_name,
+            'topic': topic_name,
+            'tests': bci_api.get_topic_tests_of_custom_framework(project_name, topic_name)
+        }
+    except Exception as e:
+        return {
+            'status': 'NOK',
+            'msg': str(e)
+        }
 
 @api.route('/options/<string:browser_name>/', methods=['GET'])
 def get_options(browser_name: str):

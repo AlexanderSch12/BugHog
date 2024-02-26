@@ -6,7 +6,21 @@ module.exports = {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
     "./node_modules/flowbite/**/*.js",
   ],
-  darkMode: ['selector'],
+  darkMode: 'class', // Enable dark mode variant
+  theme: {
+    extend: {
+      colors: {
+        blue: {
+          '700': '#...dark-blue-color',
+        },
+      },
+    },
+  },
+  variants: {
+    extend: {
+      backgroundColor: ['dark', 'dark-hover'], // Enable dark mode variants for background colors
+    },
+  },
   plugins: [
     require('flowbite/plugin'),
   ],

@@ -83,6 +83,7 @@ class BrowserConfiguration:
 class EvaluationConfiguration:
     project: str
     automation: str
+    topic: str | None = None
     seconds_per_visit: int = 10
 
     def to_dict(self) -> dict:
@@ -93,6 +94,7 @@ class EvaluationConfiguration:
         return EvaluationConfiguration(
             data['project'],
             data['automation'],
+            data['topic'],
             data['seconds_per_visit']
         )
 
@@ -214,14 +216,15 @@ class TestParameters:
     mech_group: str
     database_collection: str
 
-    def create_test_result_with(self, browser_version: str, binary_origin: str, result: dict, dirty: bool, wpt: bool) -> TestResult:
+    def create_test_result_with(self, browser_version: str, binary_origin: str, result: dict, dirty: bool, wpt: bool= False, babel: bool = False) -> TestResult:
         return TestResult(
             self,
             browser_version,
             binary_origin,
             result,
             dirty,
-            wpt
+            wpt,
+            babel
         )
 
 
@@ -233,6 +236,7 @@ class TestResult:
     requests: list | None = None
     is_dirty: bool = False
     is_wpt: bool = False
+    is_babel: bool = False
     driver_version: str | None = None
 
     @property
@@ -272,6 +276,7 @@ def evaluation_factory(kwargs: ImmutableMultiDict) -> EvaluationParameters:
     evaluation_configuration = EvaluationConfiguration(
         kwargs.get('project'),
         kwargs.get('automation'),
+        kwargs.get('topic'),
         int(kwargs.get('seconds_per_visit', 5))
     )
     evaluation_range = EvaluationRange(

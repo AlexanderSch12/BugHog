@@ -98,9 +98,11 @@ class MongoDB(ABC):
             'revision_id': result.params.state.revision_id,
             'revision_number': result.params.state.revision_number,
             'mech_group': result.params.mech_group,
+            'topic': eval_config.topic,
             'results': result.requests,
             'dirty': result.is_dirty,
             'wpt': result.is_wpt,
+            'babel': result.is_babel,
             'ts': str(datetime.now(timezone.utc).replace(microsecond=0))
         }
         if result.driver_version:

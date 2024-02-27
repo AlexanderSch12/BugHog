@@ -38,6 +38,7 @@ export default {
         extensions: [],
         // Eval config
         project: null,
+        topic: null,
         automation: "terminal",
         seconds_per_visit: 5,
         // Eval range
@@ -278,11 +279,13 @@ export default {
     },
     set_curr_project(project) {
       this.eval_params.project = project;
+      this.eval_params.topic = null;
       this.get_tests(project);
       this.eval_params.tests = [];
     },
     set_curr_project_topic(project,topic) {
       this.eval_params.project = project;
+      this.eval_params.topic = topic
       this.get_topics_tests(project,topic);
       this.eval_params.tests = [];
     },
@@ -358,7 +361,7 @@ export default {
   <header class="banner-page">
     <div>
       <button id="dropdown_project" data-dropdown-toggle="project_dropdown" class="button mx-3" type="button">
-        {{eval_params.project || "Project" }}<svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor"
+        {{(eval_params.project ? eval_params.project + (eval_params.topic ? ": " + eval_params.topic : '') : "Project")}}<svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor"
           viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg></button>
@@ -366,7 +369,6 @@ export default {
       <div id="project_dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown_project">
           <li v-for="(topics, project) in project_topics" :key="project">
-
 
             <a v-if="topics.length > 0" id="dropdown_topic" dropright data-dropdown-toggle="topic_dropdown" class="dropdown-item">
               {{ project }}

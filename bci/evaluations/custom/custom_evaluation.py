@@ -125,8 +125,12 @@ class CustomEvaluationFramework(EvaluationFramework):
 
     def get_mech_groups(self, project=None):
         if project:
-            return sorted(self.tests_per_project[project].keys())
-        return sorted(self.tests_per_project.keys())
+            if 'WPT' in project:
+                return [topic + "_" + test for topic,tests in self.tests_per_project[project].items() for test in tests]
+            else:
+                return sorted(self.tests_per_project[project].keys())
+        else:
+            return sorted(self.tests_per_project.keys())
 
     def get_projects(self) -> list[str]:
         return sorted(list(self.tests_per_project.keys()))
@@ -134,7 +138,7 @@ class CustomEvaluationFramework(EvaluationFramework):
     def get_topics(self):
         top = {}
         for project, topics in self.tests_per_project.items():
-            if project == 'WPT CSP':
+            if 'WPT' in project:
                 top[project] = list(topics.keys())
             else:
                 top[project] = []

@@ -64,7 +64,7 @@ class WorkerManager:
                         logger.info(f'Removing old container \'{container.attrs["Name"]}\' to start new one')
                         container.remove(force=True)
                 self.client.containers.run(
-                    'registry.gitlab.kuleuven.be/distrinet/research/bughog/core/worker:latest',
+                    'bughog/worker:latest',
                     name=container_name,
                     hostname=container_name,
                     shm_size='2gb',

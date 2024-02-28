@@ -122,7 +122,7 @@ class CustomEvaluationFramework(EvaluationFramework):
                 'requests': collector.requests
             }
 
-        logger.debug(f'collector requests = {collector.requests}')
+        # logger.debug(f'collector requests = {collector.requests}')
 
         return params.create_test_result_with(browser_version, binary_origin, result, is_dirty, is_wpt)
 

@@ -287,7 +287,7 @@ export default {
       this.eval_params.project = project;
       this.eval_params.topic = topic
       this.get_topics_tests(project,topic);
-      this.eval_params.tests = [];
+      // this.eval_params.tests = [];
     },
     set_curr_browser(browser) {
       this.eval_params.browser_name = browser;

@@ -138,6 +138,7 @@ class Main:
             extensions=data.get('extensions', []),
             cli_options=data.get('cli_options', []),
             dirty_allowed=data.get('dirty_allowed', True),
-            target_cookie_name=None if data.get('check_for') == 'request' else data.get('target_cookie_name', 'generic')
+            target_cookie_name=None if data.get('check_for') == 'request' else data.get('target_cookie_name', 'generic'),
+            is_babel = data.get('babel')
         )
         return Main.master.get_html_plot(params)

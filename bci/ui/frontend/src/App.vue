@@ -40,7 +40,7 @@ export default {
         project: null,
         topic: null,
         automation: "terminal",
-        seconds_per_visit: 5,
+        seconds_per_visit: 10,
         // Eval range
         tests: [],
         lower_version: null,
@@ -58,7 +58,8 @@ export default {
         db_collection: null,
         // For plotting
         plot_mech_group: null,
-        previous_nb_of_evaluations: null
+        previous_nb_of_evaluations: null,
+        babel: false
       },
       results: {
         nb_of_evaluations: 0,
@@ -70,6 +71,7 @@ export default {
       target_mech_id_input: null,
       target_mech_id: null,
       should_refresh_plot: false,
+      wpt: false
     }
   },
   computed: {
@@ -282,8 +284,10 @@ export default {
       this.eval_params.topic = null;
       this.get_tests(project);
       this.eval_params.tests = [];
+      this.wpt = false;
     },
     set_curr_project_topic(project,topic) {
+      this.wpt = true;
       this.eval_params.project = project;
       this.eval_params.topic = topic
       this.get_topics_tests(project,topic);
@@ -350,6 +354,10 @@ export default {
         }
       }
     },
+    toggle_babel(event) {
+      this.eval_params.babel = event.srcElement.checked;
+      this.update_results(true);
+    }
   },
   beforeDestroy() {
     clearInterval(this.timer);
@@ -633,6 +641,14 @@ export default {
                 </li>
               </ul>
             </div>
+            <label v-if="this.wpt == true" class="inline-flex items-center cursor-pointer">
+              <input id="babel_toggle" type="checkbox" class="sr-only peer" @click="toggle_babel($event)"
+                v-model="babel_toggle">
+                <div
+                  class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                </div>
+              <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Use Babel</span>
+            </label>
             <!-- </div> -->
             <div class="flex flex-wrap">
               <div class="radio-item m-2">

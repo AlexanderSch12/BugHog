@@ -128,7 +128,8 @@ class MongoDB(ABC):
             document['binary_origin'],
             requests=document['results']['requests'] if 'requests' in document['results'] else None,
             is_dirty=document['dirty'],
-            is_wpt=document['wpt']
+            is_wpt=document['wpt'],
+            is_babel=document['babel']
         )
 
     def has_result(self, params: TestParameters) -> bool:
@@ -284,6 +285,7 @@ class MongoDB(ABC):
         query = {
             'mech_group': params.mech_group,
             'browser_config': params.browser_config,
+            'babel': params.is_babel
         }
         query['extensions'] = {
             '$size': len(params.extensions) if params.extensions else 0
@@ -317,7 +319,8 @@ class MongoDB(ABC):
                     'browser_version': True,
                     'dirty': True,
                     'results': True,
-                    'wpt': True
+                    'wpt': True,
+                    'babel': True
                 }
             },
             {

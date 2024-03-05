@@ -263,6 +263,7 @@ class PlotParameters:
     cli_options: list[str] = None
     dirty_allowed: bool = True
     target_cookie_name: str = None
+    is_babel: bool = False
 
 
 @staticmethod

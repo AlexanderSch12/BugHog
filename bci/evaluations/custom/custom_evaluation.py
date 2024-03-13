@@ -14,7 +14,7 @@ from bci.http.collector import Collector
 logger = logging.getLogger(__name__)
 hostname = socket.gethostname()
 
-BH_WPT_BABEL = "bh_wpt_babel" in [container.name for container in docker.from_env().containers.list(all=True, ignore_removed=True)]
+# BH_WPT_BABEL = "bh_wpt_babel" in [container.name for container in docker.from_env().containers.list(all=True, ignore_removed=True)]
 
 class CustomEvaluationFramework(EvaluationFramework):
 
@@ -46,8 +46,8 @@ class CustomEvaluationFramework(EvaluationFramework):
                 continue
 
             self.tests_per_project[project_name][subtopic] = {}
-            for root,dirs,files in os.walk(subtopic_path):
-                if not dirs or not root.endswith("support"):
+            for root,dirs,files in os.walk(subtopic_path):  
+                if not root.endswith("support"):
                     for test_file in files:
                         if test_file.endswith(".html"):
                             subsubtopic_list = root.split("/" + subtopic + "/")
@@ -99,10 +99,10 @@ class CustomEvaluationFramework(EvaluationFramework):
         try:
             url_queue = self.tests[params.mech_group]
             for url in url_queue:
-                tries = 0
-                while tries < 3:
-                    tries += 1
-                    browser.visit(url)
+                # tries = 0
+                # while tries < 3:
+                #     tries += 1
+                browser.visit(url)
         except Exception as e:
             logger.error(f'Error during test: {e}', exc_info=True)
             is_dirty = True
@@ -126,7 +126,8 @@ class CustomEvaluationFramework(EvaluationFramework):
             }
 
         # logger.debug(f'collector requests = {collector.requests}') 
-        is_babel = BH_WPT_BABEL and is_wpt
+        # is_babel = BH_WPT_BABEL and is_wpt
+        is_babel = True
 
         return params.create_test_result_with(browser_version, binary_origin, result, is_dirty, is_wpt, is_babel)
 

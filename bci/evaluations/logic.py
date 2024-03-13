@@ -278,7 +278,7 @@ def evaluation_factory(kwargs: ImmutableMultiDict) -> EvaluationParameters:
         kwargs.get('project'),
         kwargs.get('automation'),
         kwargs.get('topic'),
-        int(kwargs.get('seconds_per_visit', 5))
+        int(kwargs.get('seconds_per_visit', 10))
     )
     evaluation_range = EvaluationRange(
         kwargs.get('tests', []),

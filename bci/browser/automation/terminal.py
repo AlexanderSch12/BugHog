@@ -29,8 +29,8 @@ class TerminalAutomation:
 
         try:
             stdout, stderr = proc.communicate(timeout=5)
-            # logger.debug(f"STDOUT: {stdout}")
-            # logger.debug(f"STDERR: {stderr}")
+            logger.debug(f"STDOUT: {stdout}")
+            logger.debug(f"STDERR: {stderr}")
         except subprocess.TimeoutExpired:
             logger.info("Browser process did not terminate after 5s. Killing process through pkill...")
             subprocess.run(['pkill', '-2', args[0].split('/')[-1]])

@@ -154,6 +154,12 @@ services:
     command: bash -c "cd /home/test/web-platform-tests && ./wpt serve"
 
 
+  wpt_babel:
+    extends: wpt
+    container_name: bh_wpt_babel
+    volumes:
+      - ../wpt_babel:/home/test/web-platform-tests
+
   #===================#
   # EXPERIMENT SERVER #
   #===================#

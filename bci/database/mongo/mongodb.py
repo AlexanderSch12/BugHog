@@ -149,7 +149,8 @@ class MongoDB(ABC):
             'revision_number': params.state.revision_number,
             'browser_automation': params.evaluation_configuration.automation,
             'browser_config': params.browser_configuration.browser_setting,
-            'mech_group': params.mech_group
+            'mech_group': params.mech_group,
+            'babel': params.babel
         }
         if len(params.browser_configuration.extensions) > 0:
             query['extensions'] = {

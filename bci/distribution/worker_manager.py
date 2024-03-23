@@ -27,6 +27,7 @@ class WorkerManager:
             self.client = docker.from_env()
 
     def start_test(self, params: WorkerParameters, cb: Callable, blocking_wait=True) -> None:
+        logger.debug(params)
         if self.max_nb_of_containers != 1:
             return self.__run_container(params, cb, blocking_wait)
 
@@ -80,7 +81,7 @@ class WorkerManager:
                         os.path.join(os.getenv('host_pwd'), 'browser/binaries/firefox/artisanal') + ':/app/browser/binaries/firefox/artisanal',
                         os.path.join(os.getenv('host_pwd'), 'experiments') + ':/app/experiments',
                         os.path.join(os.getenv('host_pwd'), 'browser/extensions') + ':/app/browser/extensions',
-                        os.path.join(os.getenv('host_pwd'), 'logs') + ':/app/logs',
+                        # os.path.join(os.getenv('host_pwd'), 'logs') + ':/app/logs',
                         '/dev/shm:/dev/shm',
                         os.path.join(os.getenv('host_pwd'), '../wpt') + ":/home/test/web-platform-tests"
                     ],

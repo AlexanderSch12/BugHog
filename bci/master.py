@@ -1,4 +1,5 @@
 import logging
+import docker
 
 from dotenv import load_dotenv
 
@@ -22,8 +23,10 @@ from bci.search_strategy.sequence_strategy import SequenceStrategy
 from bci.version_control import state_factory
 from bci.version_control.states.state import State
 
+
 logger = logging.getLogger(__name__)
 
+BH_WPT_BABEL = bool(docker.from_env().containers.list(all=True, ignore_removed=True, filters={'name':'bh_wpt_babel', 'status':'running'}))
 
 class Master:
 
@@ -70,7 +73,7 @@ class Master:
             evaluation_config.project
         )
         worker_manager = WorkerManager(sequence_config.nb_of_containers)
-
+        logger.debug(BH_WPT_BABEL)
         try:
             state_list = state_factory.get_state_list(browser_config, evaluation_range)
 
@@ -86,7 +89,7 @@ class Master:
             try:
                 current_state = search_strategy.next()
                 while (self.stop_gracefully or self.stop_forcefully) is False:
-                    worker_params = eval_params.create_worker_params_for(current_state, self.db_connection_params)
+                    worker_params = eval_params.create_worker_params_for(current_state, BH_WPT_BABEL, self.db_connection_params)
 
                     # Callback function for sequence strategy
                     update_outcome = self.get_update_outcome_cb(search_strategy, worker_params, sequence_config, outcome_checker)

@@ -1,7 +1,6 @@
 import logging
 import os
 import socket
-import docker
 from unittest import TestResult
 from bci.browser.configuration.browser import Browser
 
@@ -127,9 +126,9 @@ class CustomEvaluationFramework(EvaluationFramework):
 
         # logger.debug(f'collector requests = {collector.requests}') 
         # is_babel = BH_WPT_BABEL and is_wpt
-        is_babel = True
+        # is_babel = True
 
-        return params.create_test_result_with(browser_version, binary_origin, result, is_dirty, is_wpt, is_babel)
+        return params.create_test_result_with(browser_version, binary_origin, result, is_dirty, is_wpt)
 
 
     def get_mech_groups(self, project=None):

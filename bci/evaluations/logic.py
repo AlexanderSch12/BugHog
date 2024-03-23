@@ -22,14 +22,15 @@ class EvaluationParameters:
     sequence_configuration: SequenceConfiguration
     database_collection: str
 
-    def create_worker_params_for(self, state: State, database_connection_params: DatabaseConnectionParameters) -> WorkerParameters:
+    def create_worker_params_for(self, state: State, babel: bool, database_connection_params: DatabaseConnectionParameters) -> WorkerParameters:
         return WorkerParameters(
             self.browser_configuration,
             self.evaluation_configuration,
             state,
             self.evaluation_range.mech_groups,
             self.database_collection,
-            database_connection_params
+            database_connection_params,
+            babel
         )
 
     def create_test_for(self, state: State, mech_group: str) -> TestParameters:
@@ -155,6 +156,7 @@ class WorkerParameters:
     mech_groups: list[str]
     database_collection: str
     database_connection_params: DatabaseConnectionParameters
+    babel: bool
 
     def create_test_params_for(self, mech_group: str) -> TestParameters:
         assert mech_group in self.mech_groups
@@ -163,7 +165,8 @@ class WorkerParameters:
             self.evaluation_configuration,
             self.state,
             mech_group,
-            self.database_collection
+            self.database_collection,
+            self.babel
         )
 
     def create_all_test_params(self) -> list[TestParameters]:
@@ -173,7 +176,8 @@ class WorkerParameters:
                 self.evaluation_configuration,
                 self.state,
                 mech_group,
-                self.database_collection)
+                self.database_collection,
+                self.babel)
             for mech_group in self.mech_groups]
 
     def serialize(self) -> str:
@@ -183,7 +187,8 @@ class WorkerParameters:
             'state': state_factory.to_dict(self.state),
             'mech_groups': self.mech_groups,
             'database_collection': self.database_collection,
-            'database_connection_params': self.database_connection_params.to_dict()
+            'database_connection_params': self.database_connection_params.to_dict(),
+            'babel':self.babel
         })
 
     @staticmethod
@@ -195,13 +200,15 @@ class WorkerParameters:
         mech_groups = data['mech_groups']
         database_collection = data['database_collection']
         database_connection_params = DatabaseConnectionParameters.from_dict(data['database_connection_params'])
+        babel = data['babel']
         return WorkerParameters(
             browser_config,
             eval_config,
             state,
             mech_groups,
             database_collection,
-            database_connection_params
+            database_connection_params,
+            babel
         )
 
     def __str__(self) -> str:
@@ -215,8 +222,9 @@ class TestParameters:
     state: State
     mech_group: str
     database_collection: str
+    babel: bool
 
-    def create_test_result_with(self, browser_version: str, binary_origin: str, result: dict, dirty: bool, wpt: bool= False, babel: bool = False) -> TestResult:
+    def create_test_result_with(self, browser_version: str, binary_origin: str, result: dict, dirty: bool, wpt: bool= False) -> TestResult:
         return TestResult(
             self,
             browser_version,
@@ -224,7 +232,7 @@ class TestParameters:
             result,
             dirty,
             wpt,
-            babel
+            self.babel
         )
 
 

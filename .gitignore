@@ -329,3 +329,5 @@ Temporary Items
 # pytype static type analyzer
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,python,flask,macos
+
+babel/*.js

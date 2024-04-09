@@ -31,31 +31,37 @@ class CustomEvaluationFramework(EvaluationFramework):
         wpt_path = "/home/test/web-platform-tests"
         if not os.listdir(wpt_path):
             return
-        project_name = "WPT CSP"
-        topic_name = "content-security-policy"
-        topic_path =  os.path.join(wpt_path, topic_name)
-        url = "http://web-platform.test:8000"
-        url_subject = os.path.join(url,topic_name)
-        self.tests_per_project[project_name] = {}
+        for (project_name,topic_name) in [("WPT CSP", "content-security-policy"),("WPT referrer","referrer-policy"),("WPT feature","feature-policy"),("WPT credential management","credential-management")]:
+            topic_path =  os.path.join(wpt_path, topic_name)
+            url = "http://web-platform.test:8000"
+            url_subject = os.path.join(url,topic_name)
+            self.tests_per_project[project_name] = {}
 
-        for subtopic in os.listdir(topic_path):
-            subtopic_path = os.path.join(topic_path, subtopic)
-            url_subtopic = os.path.join(url_subject, subtopic)
-            if not os.path.isdir(subtopic_path) or subtopic == "support":
-                continue
-
-            self.tests_per_project[project_name][subtopic] = {}
-            for root,dirs,files in os.walk(subtopic_path):  
-                if not root.endswith("support"):
-                    for test_file in files:
-                        if test_file.endswith(".html"):
-                            subsubtopic_list = root.split("/" + subtopic + "/")
-                            test_name = os.path.splitext(test_file)[0]
-                            subsubtopic = "" if len(subsubtopic_list) == 1 else subsubtopic_list[1]
-                            test_name = test_name if len(subsubtopic_list) == 1 else subsubtopic + "-" + test_name
-                            url_test = os.path.join(url_subtopic, subsubtopic, test_file) +'?remote_ip=' + hostname
-                            self.tests_per_project[project_name][subtopic][test_name] = [url_test]
-                            self.tests[test_name] = self.tests_per_project[project_name][subtopic][test_name]
+            for subtopic in os.listdir(topic_path):
+                subtopic_path = os.path.join(topic_path, subtopic)
+                url_subtopic = os.path.join(url_subject, subtopic)
+                if subtopic == "support":
+                    continue
+                if subtopic.endswith(".html"):
+                    if 'general' not in self.tests_per_project[project_name]:
+                        self.tests_per_project[project_name]['general'] = {}
+                    test_name = os.path.splitext(subtopic)[0]
+                    url_test = url_subtopic +'?remote_ip=' + hostname
+                    self.tests_per_project[project_name]['general'][test_name] = [url_test]
+                    self.tests[test_name] = self.tests_per_project[project_name]['general'][test_name]
+                elif os.path.isdir(subtopic_path) and subtopic != "resources":
+                    self.tests_per_project[project_name][subtopic] = {}
+                    for root,dirs,files in os.walk(subtopic_path):  
+                        if not root.endswith("support") and not root.endswith("resources"):
+                            for test_file in files:
+                                if test_file.endswith(".html"):
+                                    subsubtopic_list = root.split("/" + subtopic + "/")
+                                    test_name = os.path.splitext(test_file)[0]
+                                    subsubtopic = "" if len(subsubtopic_list) == 1 else subsubtopic_list[1]
+                                    test_name = test_name if len(subsubtopic_list) == 1 else subsubtopic + "-" + test_name
+                                    url_test = os.path.join(url_subtopic, subsubtopic, test_file) +'?remote_ip=' + hostname
+                                    self.tests_per_project[project_name][subtopic][test_name] = [url_test]
+                                    self.tests[test_name] = self.tests_per_project[project_name][subtopic][test_name]
 
                     
 

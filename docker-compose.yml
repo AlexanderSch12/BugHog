@@ -29,7 +29,7 @@ services:
       - ./logs:/app/logs:rw
       - /var/run/docker.sock:/var/run/docker.sock:rw
       - /dev/shm:/dev/shm:rw
-      - ../wpt:/home/test/web-platform-tests
+      - ../web-platform-tests/wpt:/home/test/web-platform-tests
     container_name: bh_core
 
   #=============#
@@ -81,7 +81,7 @@ services:
     build:
       context: ../wpt/tools/docker
     volumes:
-      - ../wpt:/home/test/web-platform-tests
+      - ../web-platform-tests/wpt:/home/test/web-platform-tests
     container_name: bh_wpt
     ports:
       - 8000:8000
@@ -158,7 +158,7 @@ services:
     extends: wpt
     container_name: bh_wpt_babel
     volumes:
-      - ../wpt_babel:/home/test/web-platform-tests
+      - ../web-platform-tests/wpt_babel:/home/test/web-platform-tests
 
   #===================#
   # EXPERIMENT SERVER #

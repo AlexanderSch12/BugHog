@@ -5,7 +5,8 @@
       {
         "targets":
         {
-          "chrome": 26
+          "chrome": 26,
+          "firefox": 24
         }
       }
   //       ,

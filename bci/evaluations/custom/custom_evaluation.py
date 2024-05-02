@@ -104,10 +104,10 @@ class CustomEvaluationFramework(EvaluationFramework):
         try:
             url_queue = self.tests[params.mech_group]
             for url in url_queue:
-                # tries = 0
-                # while tries < 3:
-                #     tries += 1
-                browser.visit(url)
+                tries = 0
+                while tries < 3:
+                    tries += 1
+                    browser.visit(url)
         except Exception as e:
             logger.error(f'Error during test: {e}', exc_info=True)
             is_dirty = True

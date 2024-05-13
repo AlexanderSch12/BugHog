@@ -79,7 +79,7 @@ services:
   wpt:
     image: wpt:local
     build:
-      context: ../wpt/tools/docker
+      context: ../web-platform-tests/wpt/tools/docker
     volumes:
       - ../web-platform-tests/wpt:/home/test/web-platform-tests
     container_name: bh_wpt
@@ -151,7 +151,7 @@ services:
           - www1.xn--lve-6lad.not-web-platform.test
           - www2.www1.web-platform.test
           - www.www1.web-platform.test
-    command: bash -c "cd /home/test/web-platform-tests && ./wpt serve"
+    command: bash -c "cd /home/test/web-platform-tests && ./wpt serve --inject-script=polyfill.js"
 
 
   wpt_babel:

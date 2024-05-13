@@ -33,7 +33,7 @@ class CustomEvaluationFramework(EvaluationFramework):
             return
         for (project_name,topic_name) in [("WPT CSP", "content-security-policy"),("WPT referrer","referrer-policy"),("WPT feature","feature-policy"),("WPT credential management","credential-management")]:
             topic_path =  os.path.join(wpt_path, topic_name)
-            url = "http://web-platform.test:8000"
+            url = "https://web-platform.test:8443"
             url_subject = os.path.join(url,topic_name)
             self.tests_per_project[project_name] = {}
 

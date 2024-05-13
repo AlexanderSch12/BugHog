@@ -3,6 +3,7 @@ import os
 import json
 from dataclasses import asdict, dataclass
 from dotenv import load_dotenv
+import pandas as pd
 
 from pymongo import MongoClient, UpdateOne
 from pymongo.collection import Collection
@@ -162,7 +163,7 @@ def compare_babel():
         nb_tests = len(tests_set)
         nb_error_tests = 0
         for mech_group in test_error_set:
-            if test_error_set[mech_group] >= 15:
+            if test_error_set[mech_group] >= 5:
                 nb_error_tests += 1
 
         error_perc = nb_error_tests/nb_tests
@@ -197,13 +198,19 @@ def compare_babel():
     print()
 
 
-def find_bugs(col, topics):
+def find_bugs(col, cutoff, topics):
     collection = get_collection(col)
     for topic in topics:
         raw_results = collection.aggregate([
                 {
                     '$match': {
                         'topic': topic,
+                        '$expr': {
+                            '$gte': [
+                            { '$toDouble': { '$arrayElemAt': [ { '$split': ["$browser_version", "."] }, 0 ] } },
+                                cutoff
+                            ]
+                        }
                     }
                 },
                 {
@@ -242,11 +249,14 @@ def find_bugs(col, topics):
             for result in results:
                 if result['result'] == False:
                     if not mech_group in test_error_set.keys():
-                        test_error_set[mech_group] = 1
+                        test_error_set[mech_group] = [1]
                     else:
-                        test_error_set[mech_group] += 1
+                        test_error_set[mech_group][0] += 1
         
         print(test_error_set)
+        df = pd.DataFrame(data=test_error_set)
+        df = df.T
+        df.to_excel(f"{col}_{topic}.xlsx",sheet_name=col)
         print(f"{len(test_error_set)} reproduced test on {len(tests_set)} tests")
         print()
 
@@ -255,8 +265,9 @@ if __name__ == "__main__":
     db_params = get_database_connection_params()
     connect(db_params)
 
-    collections = [("wpt feature_chromium",["general","experimental-features"]),("wpt referrer_chromium",["generic","css-integration"])]
-    for (collection,topics) in collections:
-        find_bugs(collection,topics)
+    # compare_babel()
+    collections = [("wpt feature_chromium",74,["general","experimental-features","reporting"]),("wpt referrer_chromium",85,["generic"]),("wpt referrer_firefox",87,["generic"])]
+    for (collection,cutoff,topics) in collections:
+        find_bugs(collection,cutoff,topics)
     
     disconnect()

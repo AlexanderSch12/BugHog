@@ -79,6 +79,20 @@ RUN mkdir -p $HOME/.pki/nssdb && \
 #     echo "tls_version_server_min: UNBOUND" >> /home/bci/.mitmproxy/config.yaml && \
 #     echo "listen_port: 8081" >> /home/bci/.mitmproxy/config.yaml
 
+# Add WPT cert PEM
+COPY ssl/cacert.pem /home/bci/cacert.crt
+
+RUN cp /home/bci/cacert.crt /usr/local/share/ca-certificates/cacert.crt
+RUN update-ca-certificates
+
+RUN certutil -d sql:$HOME/.pki/nssdb -A -t TC -n wpt-ca -i /home/bci/cacert.crt && \
+# Add certificates to Firefox
+# Legacy se rity databases (cert8.db and key3.db)
+    certutil -A -n wpt-ca -t CT,c -i /home/bci/cacert.crt -d /app/browser/profiles/firefox/default-67/ && \
+    certutil -A -n wpt-ca -t CT,c -i /home/bci/cacert.crt -d /app/browser/profiles/firefox/tp-67/ && \
+# New SQL security databases (cert9.db and key4.db)
+    certutil -A -n wpt-ca -t CT,c -i /home/bci/cacert.crt -d sql:/app/browser/profiles/firefox/default-67/ && \
+    certutil -A -n wpt-ca -t CT,c -i /home/bci/cacert.crt -d sql:/app/browser/profiles/firefox/tp-67/
 
 FROM base AS core
 # Copy rest of source code

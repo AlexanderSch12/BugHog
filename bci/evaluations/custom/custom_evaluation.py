@@ -105,7 +105,7 @@ class CustomEvaluationFramework(EvaluationFramework):
             url_queue = self.tests[params.mech_group]
             for url in url_queue:
                 tries = 0
-                while tries < 3:
+                while tries < 2:
                     tries += 1
                     browser.visit(url)
         except Exception as e:

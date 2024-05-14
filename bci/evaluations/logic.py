@@ -85,7 +85,7 @@ class EvaluationConfiguration:
     project: str
     automation: str
     topic: str | None = None
-    seconds_per_visit: int = 10
+    seconds_per_visit: int = 5
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -286,7 +286,7 @@ def evaluation_factory(kwargs: ImmutableMultiDict) -> EvaluationParameters:
         kwargs.get('project'),
         kwargs.get('automation'),
         kwargs.get('topic'),
-        int(kwargs.get('seconds_per_visit', 10))
+        int(kwargs.get('seconds_per_visit', 5))
     )
     evaluation_range = EvaluationRange(
         kwargs.get('tests', []),
